@@ -1,0 +1,23 @@
+.room-list {
+  width: 100%;
+  padding: 0.25rem 1rem 1rem;
+}
+
+.room-list h2 {
+  margin-bottom: 1rem;
+  color: #673AB7;
+  font-weight: 600;
+  padding: 0.75rem 0 0.5rem;
+}
+
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .room-grid {
+    grid-template-columns: 1fr;
+  }
+}

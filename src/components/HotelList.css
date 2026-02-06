@@ -1,0 +1,25 @@
+.hotel-list {
+  width: 100%;
+}
+
+.hotel-list h1 {
+  margin-bottom: 1rem;
+  color: #673AB7;
+  font-weight: 600;
+  padding: 0 1.25rem;
+  padding-top: 0.75rem;
+}
+
+.hotel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.75rem;
+  padding: 0.25rem 1rem 1rem;
+}
+
+@media (max-width: 768px) {
+  .hotel-grid {
+    grid-template-columns: 1fr;
+    padding: 0.25rem 1rem 1rem;
+  }
+}

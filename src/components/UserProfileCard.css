@@ -1,0 +1,78 @@
+.user-profile-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border: 1px solid rgba(103, 58, 183, 0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.user-profile-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+  border-color: rgba(103, 58, 183, 0.4);
+}
+
+.user-profile-card.empty {
+  border: 2px dashed rgba(103, 58, 183, 0.4);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.profile-icon {
+  font-size: 2rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(103, 58, 183, 0.1);
+  border-radius: 50%;
+}
+
+.profile-text {
+  flex: 1;
+}
+
+.profile-label {
+  font-weight: 600;
+  color: #673AB7;
+  margin-bottom: 0.25rem;
+}
+
+.profile-hint {
+  font-size: 0.875rem;
+  color: #999;
+}
+
+.profile-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.profile-email {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #ffebee;
+}
