@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
 import { CANCEL_BOOKING } from '../graphql/mutations';
 import { GET_ROOMS } from '../graphql/queries';
 import { BookingService } from '../services/BookingService';
 import { useToast } from '../context/ToastContext';
+import { useUser } from '../context/UserContext';
 import type { Booking, Room } from '../types';
 import './BookingList.css';
 
@@ -14,6 +15,7 @@ interface BookingListProps {
 
 export const BookingList = ({ roomId, room }: BookingListProps) => {
   const { showToast } = useToast();
+  const { user } = useUser();
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [conflictingBookings, setConflictingBookings] = useState<Booking[]>([]);
@@ -21,6 +23,11 @@ export const BookingList = ({ roomId, room }: BookingListProps) => {
 
   const [cancelBookingMutation] = useMutation(CANCEL_BOOKING);
   const bookingService = new BookingService();
+
+  // Проверяем, принадлежит ли бронирование текущему пользователю
+  const isUserBooking = (booking: Booking) => {
+    return user && booking.guestEmail.toLowerCase() === user.email.toLowerCase();
+  };
 
   const handleCheckAvailability = async () => {
     if (!checkIn || !checkOut) {
@@ -53,7 +60,7 @@ export const BookingList = ({ roomId, room }: BookingListProps) => {
         refetchQueries: [{ query: GET_ROOMS }],
       });
       showToast('Бронирование успешно отменено', 'success');
-      // Обновляем список конфликтующих броней
+      // Обновляем проверку доступности, если были указаны даты
       if (checkIn && checkOut) {
         handleCheckAvailability();
       }
@@ -110,9 +117,9 @@ export const BookingList = ({ roomId, room }: BookingListProps) => {
           </button>
         </div>
 
-        {conflictingBookings.length > 0 && (
+        {conflictingBookings.length > 0 && checkIn && checkOut && (
           <div className="conflicting-bookings">
-            <h4>Конфликтующие бронирования ({conflictingBookings.length}):</h4>
+            <h4>Конфликтующие бронирования на указанный период ({conflictingBookings.length}):</h4>
             <div className="bookings-grid">
               {conflictingBookings
                 .filter((booking) => booking.isActive)
@@ -120,7 +127,7 @@ export const BookingList = ({ roomId, room }: BookingListProps) => {
                   <div key={booking.id} className="booking-item">
                     <div className="booking-header">
                       <strong>{booking.guestName}</strong>
-                      {booking.isActive && (
+                      {booking.isActive && isUserBooking(booking) && (
                         <button
                           onClick={() => handleCancelBooking(booking.id)}
                           className="cancel-button"

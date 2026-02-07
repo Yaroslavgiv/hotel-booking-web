@@ -1,5 +1,5 @@
 import { apolloClient } from '../apollo/client';
-import { CHECK_AVAILABILITY } from '../graphql/queries';
+import { CHECK_AVAILABILITY, GET_BOOKINGS_BY_ROOM } from '../graphql/queries';
 import { CREATE_BOOKING, CANCEL_BOOKING } from '../graphql/mutations';
 import { GET_ROOMS } from '../graphql/queries';
 import type { AvailabilityResult, CreateBookingInput, Booking } from '../types';
@@ -16,6 +16,15 @@ export class BookingService {
       fetchPolicy: 'network-only',
     });
     return data.checkAvailability;
+  }
+
+  async getBookingsByRoom(roomId: string): Promise<Booking[]> {
+    const { data } = await apolloClient.query({
+      query: GET_BOOKINGS_BY_ROOM,
+      variables: { roomId },
+      fetchPolicy: 'network-only',
+    });
+    return data.bookingsByRoom || [];
   }
 
   async createBooking(input: CreateBookingInput): Promise<Booking> {

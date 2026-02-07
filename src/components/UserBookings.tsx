@@ -24,24 +24,18 @@ export const UserBookings = ({ roomId, userEmail, onRefresh }: UserBookingsProps
     if (userEmail) {
       loadUserBookings();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, userEmail]);
 
   const loadUserBookings = async () => {
     setLoading(true);
     try {
       const bookingService = new BookingService();
-      // Используем широкий диапазон дат для получения всех активных броней
-      const today = new Date();
-      const nextYear = new Date(today);
-      nextYear.setFullYear(today.getFullYear() + 1);
-
-      const checkIn = today.toISOString().split('T')[0];
-      const checkOut = nextYear.toISOString().split('T')[0];
-
-      const result = await bookingService.checkAvailability(roomId, checkIn, checkOut);
+      // Используем прямой запрос для получения всех активных бронирований номера
+      const allBookings = await bookingService.getBookingsByRoom(roomId);
       
       // Фильтруем только бронирования текущего пользователя
-      const userBookings = result.conflictingBookings.filter(
+      const userBookings = allBookings.filter(
         (booking) => 
           booking.isActive && 
           booking.guestEmail.toLowerCase() === userEmail.toLowerCase()
@@ -50,6 +44,7 @@ export const UserBookings = ({ roomId, userEmail, onRefresh }: UserBookingsProps
       setBookings(userBookings);
     } catch (err) {
       console.error('Ошибка при загрузке броней пользователя:', err);
+      setBookings([]);
     } finally {
       setLoading(false);
     }

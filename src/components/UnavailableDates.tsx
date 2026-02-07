@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BookingService } from '../services/BookingService';
 import type { Booking } from '../types';
 import './UnavailableDates.css';
@@ -10,33 +10,43 @@ interface UnavailableDatesProps {
 export const UnavailableDates = ({ roomId }: UnavailableDatesProps) => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const bookingServiceRef = useRef(new BookingService());
 
   useEffect(() => {
     loadUnavailableDates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
   const loadUnavailableDates = async () => {
+    if (!roomId) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
-      const bookingService = new BookingService();
-      // Используем широкий диапазон дат для получения всех активных броней
-      const today = new Date();
-      const nextYear = new Date(today);
-      nextYear.setFullYear(today.getFullYear() + 1);
+      // Используем прямой запрос для получения всех активных бронирований номера
+      // Это более эффективно, чем checkAvailability с широким диапазоном дат
+      console.log(`[UnavailableDates] Загрузка бронирований для номера ${roomId}`);
 
-      const checkIn = today.toISOString().split('T')[0];
-      const checkOut = nextYear.toISOString().split('T')[0];
-
-      const result = await bookingService.checkAvailability(roomId, checkIn, checkOut);
+      const activeBookings = await bookingServiceRef.current.getBookingsByRoom(roomId);
       
-      // Фильтруем только активные бронирования
-      const activeBookings = result.conflictingBookings.filter(
-        (booking) => booking.isActive
+      console.log(`[UnavailableDates] Получено активных бронирований: ${activeBookings.length}`);
+      
+      // Фильтруем только активные бронирования (на всякий случай, хотя бэкенд уже возвращает только активные)
+      const filteredBookings = activeBookings.filter(
+        (booking) => booking.isActive === true
       );
       
-      setBookings(activeBookings);
+      // Сортируем по дате заезда
+      filteredBookings.sort((a, b) => 
+        new Date(a.checkIn).getTime() - new Date(b.checkIn).getTime()
+      );
+      
+      setBookings(filteredBookings);
     } catch (err) {
       console.error('Ошибка при загрузке недоступных дат:', err);
+      setBookings([]);
     } finally {
       setLoading(false);
     }

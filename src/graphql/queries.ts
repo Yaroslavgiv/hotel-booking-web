@@ -78,3 +78,17 @@ export const CHECK_AVAILABILITY = gql`
     }
   }
 `;
+
+export const GET_BOOKINGS_BY_ROOM = gql`
+  query GetBookingsByRoom($roomId: ID!) {
+    bookingsByRoom(roomId: $roomId) {
+      id
+      guestName
+      guestEmail
+      checkIn
+      checkOut
+      isActive
+      roomId
+    }
+  }
+`;
